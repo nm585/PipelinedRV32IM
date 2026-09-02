@@ -105,16 +105,10 @@ package aux_package is
 			dtcm_data_wr_i 	: IN 	STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
 			MemRead_ctrl_i  : IN 	STD_LOGIC;
 			MemWrite_ctrl_i : IN 	STD_LOGIC;
-			P0_i      			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			P1_i      			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			P2_i      			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			P3_i      			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-			MULOP_i    			: IN  STD_LOGIC_VECTOR(6 DOWNTO 0);
 
 			--Outputs
 			Flush_o					: OUT STD_LOGIC;
-			dtcm_data_rd_o 	: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
-			MUL_res_o 			: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0)
+			dtcm_data_rd_o 	: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0)
 		);
 	end component;
 ---------------------------------------------------------		
@@ -138,16 +132,12 @@ package aux_package is
 			-- Forwarding data sources
 			exmem_alu_res_i	: IN  STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
 			memwb_wdata_i	: IN  STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
-			MULOP_i			: IN  STD_LOGIC_VECTOR(6 DOWNTO 0);
 			-- Outputs
 			brTaken_o		: OUT STD_LOGIC;
 			alu_res_o		: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
 			addr_gen_o		: OUT STD_LOGIC_VECTOR(PC_WIDTH-1 DOWNTO 0);
 			fwd_b_o			: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
-			P0_o			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			P1_o			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			P2_o			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-			P3_o			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+			fwd_a_o			: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0)
 		);
 	end component;
 ---------------------------------------------------------		

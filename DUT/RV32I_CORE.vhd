@@ -140,6 +140,9 @@ ARCHITECTURE structure OF RV32I_CORE IS
 	SIGNAL addr_gen_w 		: STD_LOGIC_VECTOR(PC_WIDTH-1 DOWNTO 0);
 	SIGNAL fwd_b_w				: STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
 
+	-- Forwarded A operand (EXECUTE's fwd_a_o) -> Multiplier_Stage1 input
+	SIGNAL fwd_a_w				: STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
+
 	-- Multiplier Stage 1 outputs (EX) -> EX/MEM register inputs
 	SIGNAL EX_P0_w				: STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL EX_P1_w				: STD_LOGIC_VECTOR(15 DOWNTO 0);
@@ -543,18 +546,53 @@ BEGIN
 		fwd_bin_i				=> Forward_Bin_w,
 		exmem_alu_res_i	=> EXMEM_alu_res_w,
 		memwb_wdata_i		=> wb_wdata_w,
-		MULOP_i					=> IDEX_MulOp_w,
 
 		--Outputs
 		brTaken_o 			=> brTaken_w,
         alu_res_o			=> alu_res_w,
 		addr_gen_o 			=> addr_gen_w,
-		fwd_b_o				=> fwd_b_w,
-		P0_o					=> EX_P0_w,
-		P1_o					=> EX_P1_w,
-		P2_o					=> EX_P2_w,
-		P3_o					=> EX_P3_w
+		fwd_a_o				=> fwd_a_w,
+		fwd_b_o				=> fwd_b_w
 	);
+	--=======================================
+	-- Multiplier Stage 1 — in EX stage
+	-- Ain/Bin both come directly from EXECUTE's forwarded operands
+	-- (fwd_a_o/fwd_b_o); MUL never substitutes an immediate for either
+	--=======================================
+
+
+	MUL1 : Multiplier_Stage1
+	GENERIC MAP(
+		DATA_BUS_WIDTH => DATA_BUS_WIDTH
+	)
+	PORT MAP (
+		Ain   => fwd_a_w,
+		Bin   => fwd_b_w,
+		MULOP => IDEX_MulOp_w,
+		P0_o => EX_P0_w,
+		P1_o => EX_P1_w,
+		P2_o => EX_P2_w,
+		P3_o => EX_P3_w
+	);
+
+	--=======================================
+	-- Multiplier Stage 2 — in MEM stage
+	-- MULOP must be the EX/MEM-pipelined control bit (matches the partial
+	-- products' own pipeline stage), not the raw combinational ID-stage one
+	--=======================================
+	MUL2 : Multiplier_Stage2
+	GENERIC MAP(
+		DATA_BUS_WIDTH => DATA_BUS_WIDTH
+	)
+	PORT MAP (
+		P0_i      => EXMEM_P0_w,
+		P1_i      => EXMEM_P1_w,
+		P2_i      => EXMEM_P2_w,
+		P3_i      => EXMEM_P3_w,
+		MULOP     => EXMEM_MulOp_w,
+		MUL_res_o => MUL_res_w
+	);
+
 	--=======================================
 	-- DTCM module connection (MEM stage, off EX/MEM-registered signals)
 	--=======================================
@@ -581,16 +619,10 @@ BEGIN
 		dtcm_data_wr_i 		=> EXMEM_read_data2_w,
 		MemRead_ctrl_i 		=> EXMEM_MemRead_w,
 		MemWrite_ctrl_i 	=> EXMEM_MemWrite_w,
-		P0_i      				=> EXMEM_P0_w,
-		P1_i      				=> EXMEM_P1_w,
-		P2_i      				=> EXMEM_P2_w,
-		P3_i      				=> EXMEM_P3_w,
-		MULOP_i    				=> EXMEM_MulOp_w,
 
 		--Outputs
 		Flush_o					=> flush_w,                       -- redirect flush, drives IF/ID + ID/EX + EX/MEM
-		dtcm_data_rd_o 		=> dtcm_data_rd_w,
-		MUL_res_o 				=> MUL_res_w
+		dtcm_data_rd_o 		=> dtcm_data_rd_w
 	);
 
 	--=======================================

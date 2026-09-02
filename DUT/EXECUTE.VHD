@@ -16,7 +16,6 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_SIGNED.ALL;
 USE work.const_package.all;
-USE work.aux_package.all;
 
 
 ENTITY Execute IS
@@ -41,17 +40,13 @@ ENTITY Execute IS
 		-- Forwarding data sources
 		exmem_alu_res_i	: IN  STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);  -- from EX/MEM
 		memwb_wdata_i	: IN  STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);  -- from MEM/WB
-		MULOP_i			: IN  STD_LOGIC_VECTOR(6 DOWNTO 0);
 
 		-- Outputs
 		brTaken_o		: OUT STD_LOGIC;
 		alu_res_o		: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
 		addr_gen_o		: OUT STD_LOGIC_VECTOR(PC_WIDTH-1 DOWNTO 0);
 		fwd_b_o			: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);   -- forwarded rs2 (for store)
-		P0_o			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		P1_o			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		P2_o			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-		P3_o			: OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+		fwd_a_o			: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0)
 	);	
 END Execute;
 
@@ -108,6 +103,8 @@ ain_w <=
     memwb_wdata_i   WHEN fwd_ain_i = "01" ELSE
     fwd_a_w;
 
+fwd_a_o <= ain_w;
+
 
 --------------------------------------------------------------------
 -- B operand
@@ -123,21 +120,6 @@ bin_w <=
     fwd_b_w;
 
 fwd_b_o <= fwd_b_w;
-
-	MUL1 : Multiplier_Stage1
-	GENERIC MAP(
-		DATA_BUS_WIDTH => DATA_BUS_WIDTH
-	)
-	PORT MAP (
-		Ain   => ain_w,
-		Bin   => fwd_b_w,
-		MULOP => MULOP_i,
-		P0_o  => P0_o,
-		P1_o  => P1_o,
-		P2_o  => P2_o,
-		P3_o  => P3_o
-	);
-
 	--------------------------------------------------------------------
 	-- Reused sub-expressions
 	--------------------------------------------------------------------

@@ -7,7 +7,6 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_SIGNED.ALL;
-USE work.aux_package.all;
 
 LIBRARY altera_mf;
 USE altera_mf.altera_mf_components.all;
@@ -28,16 +27,10 @@ ENTITY dmemory IS
 		dtcm_data_wr_i 	: IN 	STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
 		MemRead_ctrl_i  : IN 	STD_LOGIC;
 		MemWrite_ctrl_i : IN 	STD_LOGIC;
-		P0_i      			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-		P1_i      			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-		P2_i      			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-		P3_i      			: IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
-		MULOP_i    			: IN  STD_LOGIC_VECTOR(6 DOWNTO 0);
 
 		--Outputs
 		Flush_o					: OUT STD_LOGIC;   -- redirect flush (MEM stage), feeds IF/ID + ID/EX + EX/MEM
-		dtcm_data_rd_o 	: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0);
-		MUL_res_o 			: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0)
+		dtcm_data_rd_o 	: OUT STD_LOGIC_VECTOR(DATA_BUS_WIDTH-1 DOWNTO 0)
 	);
 END dmemory;
 
@@ -65,19 +58,6 @@ BEGIN
 		address_a								=> dtcm_addr_i,
 		data_a									=> dtcm_data_wr_i,
 		q_a											=> dtcm_data_rd_o	
-	);
-
-	MUL2 : Multiplier_Stage2
-	GENERIC MAP(
-		DATA_BUS_WIDTH => DATA_BUS_WIDTH
-	)
-	PORT MAP (
-		P0_i      => P0_i,
-		P1_i      => P1_i,
-		P2_i      => P2_i,
-		P3_i      => P3_i,
-		MULOP     => MULOP_i,
-		MUL_res_o => MUL_res_o
 	);
 
 	wrclk_w <= NOT clk_i;	-- Load memory address register with write clock
