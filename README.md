@@ -6,6 +6,10 @@ FPGA board wrapper: **`FPGA_Top_Pipeline`** (`DUT/FPGA_Top_Pipeline.vhd`).
 
 Course context: *Advanced CPU Architecture and Hardware Accelerators Lab 361‑1‑4693, BGU.*
 
+## Target development board
+
+This project was designed and built to run on the **Terasic DE10-Standard** development kit, based on the Intel Cyclone V SoC FPGA.
+
 ---
 
 ## Pipeline stages
